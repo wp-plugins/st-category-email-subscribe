@@ -1,9 +1,9 @@
-=== Plugin Name ===
+=== St Category Email Subscribe ===
 Contributors: dharashah
 Donate link: http://sanskrutitech.in/index.php/wordpress-plugins/
 Tags: subscribe, email, category
-Requires at least: 3.3.1
-Tested up to: 3.8.2
+Requires at least: 3.5
+Tested up to: 3.9
 Stable tag: 0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -17,7 +17,7 @@ Surprisingly there is no plugin available to allow users to subscribe for posts 
  Once a subscriber is added for a particular category, he/she will receive emails as soon as a post is published in that category.
 
 
-** Features **
+**Features**
 1. Add Subscribers for their desired category
 2. Use Widget or Short Code to display Subscriber Form
 3. Add the Subscribers manually, or upload in batch from a CSV file.
