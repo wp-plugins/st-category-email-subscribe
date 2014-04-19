@@ -18,10 +18,10 @@ Surprisingly there is no plugin available to allow users to subscribe for posts 
 
 
 **Features**
-1. Add Subscribers for their desired category.
-2. Use Widget or Short Code to display Subscriber Form.
-3. Add the Subscribers manually, or upload in batch from a CSV file.
-4. Email will be sent to all subscribers as soon as a post is published in that category.
+* Add Subscribers for their desired category.
+* Use Widget or Short Code to display Subscriber Form.
+* Add the Subscribers manually, or upload in batch from a CSV file.
+* Email will be sent to all subscribers as soon as a post is published in that category.
 
 == Installation ==
 
