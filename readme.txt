@@ -36,7 +36,7 @@ Surprisingly there is no plugin available to allow users to subscribe for posts 
 == How To Use ==
 1. Go To **St Category Email Subscribe** In Side Menu
 2. Enter the Send Email from Email and Name in Settings
-2. Add **Subscribers** by :
+3. Add **Subscribers** by :
 	a. Allow users to Subscribe using Subscription Form
 	   You can either use the widget to display the Subscription from
 	   Or use shortcode [st_category_subscribe_form] to display subscription form.
@@ -50,7 +50,7 @@ Surprisingly there is no plugin available to allow users to subscribe for posts 
 		 From the second line, the data should begin in following order :
 			**Name,Email,Category ID**
 			 *Category ID* : 0 for all categories, Category ID for a particular category.
-3.  The Added Subscribers will be shown in the table 
+4.  The Added Subscribers will be shown in the table 
 5. 	You can Unsubscribe the Subscriber by select the emails and using the **Unsubscribe** button 
 
 == Changelog ==
