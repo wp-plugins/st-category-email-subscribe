@@ -143,17 +143,17 @@ function st_category_email_subscribe_form($atts){
 
 function st_category_email_subscribe_shortcode($atts=array()){
 	$atts = shortcode_atts(array(
-		"prepend" => _e('Subscribe to receive posts in email','stemail'),  
+		"prepend" => 'Like our posts? Subscribe to our newsletter',  
         "showname" => true,
-		"nametxt" => _e('Name:','stemail'),
-		"nameholder" => _e('Name...','stemail'),
-		"emailtxt" => _e('Email:','stemail'),
-		"emailholder" => _e('Email Address...','stemail'),
+		"nametxt" => 'Name:',
+		"nameholder" => 'Name...',
+		"emailtxt" => 'Email:',
+		"emailholder" => 'Email Address...',
 		"showcategory" => true,
-		"categorytxt" => _e('Category:','stemail'),
-		"submittxt" => _e('Submit','stemail'),
+		"categorytxt" => 'Category:',
+		"submittxt" =>'Submit',
 		"jsthanks" => false,
-		"thankyou" => _e('Thank you for subscribing to our mailing list','stemail')
+		"thankyou" => 'Thank you for subscribing to our mailing list'
     ), $atts);
 	
 	return st_category_email_subscribe_form($atts);
@@ -339,17 +339,17 @@ function st_send_email($post_ID){
 	function form( $instance ) 
 	{
 		/* Set up some default widget settings. */
-		$defaults = array( 	'prepend' => _e('Subscribe to receive updates in email','stemail'),
+		$defaults = array( 	'prepend' => 'Subscribe to receive updates in email',
 							'showname' => '1',
-							'nametxt' => _e('Name:','stemail'),
-							'nameholder' => _e('Name...','stemail'),
-							'emailtxt' => _e('Email:','stemail'),
-							'emailholder' => _e('Email Address...','stemail'),
+							'nametxt' => 'Name:',
+							'nameholder' => 'Name...',
+							'emailtxt' => 'Email:',
+							'emailholder' => 'Email Address...',
 							'showcategory' => '1',
-							'categorytxt' => _e('Category:','stemail'),
-							'submittxt' => _e('Submit','stemail'),
+							'categorytxt' => 'Category:',
+							'submittxt' => 'Submit',
 							'jsthanks' => '0',
-							'thankyou' => _e('Thank you for subscribing to our mailing list','stemail'));
+							'thankyou' => 'Thank you for subscribing to our mailing list');
 		$instance = wp_parse_args( $instance, $defaults );
 		
 	?>
