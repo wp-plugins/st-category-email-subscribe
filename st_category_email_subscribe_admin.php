@@ -22,12 +22,9 @@ function st_category_email_subscribe_export_csv(){
 		echo st_category_email_subscribe_generate($getTable);
 		exit;
 	}
-	
 }
 
 function st_category_email_subscribe_generate($getTable){
-
-
 	ob_clean();
 	
 	$field='';
@@ -70,7 +67,6 @@ function st_category_email_subscribe_generate($getTable){
 
 		return $fields;
   }
-	
 }
 
 function st_category_email_subscribe_settings_page() {
@@ -87,21 +83,21 @@ function st_category_email_subscribe_settings_page() {
 	
 	?>
 		<div class="wrap">  
-			<h2>Category Email Subscribe Plugin</h2>
+			<h2><?php _e('Category Email Subscribe Plugin', 'stemail')?></h2>
 			<div class="postbox-container" style="width:70%;padding-right:25px;">
 				<div class="metabox-holder">
 					<div class="meta-box-sortables">
 						<div id="toc" class="postbox">
 							<div class="handlediv" title="Click to toggle"><br /></div>
-							<h3 class="hndle"><span>Settings</span></h3>
+							<h3 class="hndle"><span><?php _e('Settings', 'stemail')?></span></h3>
 							<div class="inside">
 								<form id="st_settings" method="POST">
 									<div>
-										<label for="send_email">Send Email From (Email): </label>
+										<label for="send_email"><?php _e('Send Email From (Email): ', 'stemail')?></label>
 										<input class="regular-text" type="text" name="send_email" value="<?php echo $send_email; ?>"/>
 									</div>
 									<div>
-										<label for="from_name">Send Email From (Name): </label>
+										<label for="from_name"><?php _e('Send Email From (Name): ', 'stemail')?></label>
 										<input class="regular-text" type="text" name="from_name" value="<?php echo $from_name; ?>"/>
 									</div>	
 									<input class="button-primary" type="submit" name="save_send_email" value="Save" />
@@ -110,19 +106,19 @@ function st_category_email_subscribe_settings_page() {
 						</div>
 						<div id="toc" class="postbox">
 							<div class="handlediv" title="Click to toggle"><br /></div>
-							<h3 class="hndle"><span>How to Use</span></h3>
+							<h3 class="hndle"><span><?php _e('How to Use', 'stemail')?></span></h3>
 							<div class="inside">
-							<strong>1. Enter the Send Email from Email and Name</strong><br/>
-							All emails will be sent from this name and email<br/>
-							<strong>2. Add Subscribers</strong><br/>
-							Go to St Category Emai Subscribe > Subscribers to Manage Subscribers<br/>
-							You can manually add a subscriber
-							Or Import an entire list
-							The emails will be sent as soon as a <strong>Post is Published</strong>
-							The email will be sent only to the subscribers registered for the category of Post<br/>
-							<strong>3. Add Subscribe Form</strong><br/>
-							Place the subscribe form on your website using <strong>Widget : Category Email Subscribe Form</strong>
-							Or Short code [st_category_subscribe_form]
+							<strong><?php _e('1. Enter the Send Email from Email and Name', 'stemail')?></strong><br/>
+							<?php _e('All emails will be sent from this name and email', 'stemail')?><br/>
+							<strong><?php _e('2. Add Subscribers', 'stemail')?></strong><br/>
+							<?php _e('Go to St Category Emai Subscribe > Subscribers to Manage Subscribers', 'stemail')?><br/>
+							<?php _e('You can manually add a subscriber', 'stemail')?><br/>
+							<?php _e('Or Import an entire list', 'stemail')?><br/>
+							<?php _e('The emails will be sent as soon as a ', 'stemail')?><strong><?php _e('Post is Published', 'stemail')?></strong><br/>
+							<?php _e('The email will be sent only to the subscribers registered for the category of Post', 'stemail')?><br/>
+							<strong><?php _e('3. Add Subscribe Form', 'stemail')?></strong><br/>
+							<?php _e('Place the subscribe form on your website using ', 'stemail')?><strong><?php _e('Widget : Category Email Subscribe Form', 'stemail')?></strong>
+							<?php _e('Or Short code [st_category_subscribe_form]', 'stemail')?>
 							</div>
 						</div>
 					</div>
@@ -134,17 +130,17 @@ function st_category_email_subscribe_settings_page() {
 						
 						<div id="toc" class="postbox">
 							<div class="handlediv" title="Click to toggle"><br /></div>
-							<h3 class="hndle"><span>Show your Support</span></h3>
+							<h3 class="hndle"><span><?php _e('Show your Support', 'stemail')?></span></h3>
 							<div class="inside">
 								<p>
-								<strong>Want to help make this plugin even better? All donations are used to improve this plugin, so donate $20, $50 or $100 now!</strong>
+								<strong><?php _e('Want to help make this plugin even better? All donations are used to improve this plugin, so donate $20, $50 or $100 now!', 'stemail')?></strong>
 								</p>
-								<a href="http://sanskrutitech.in/wordpress-plugins/wordpress-plugins-st-daily-tip/">Donate</a>
+								<a href="http://sanskrutitech.in/wordpress-plugins/wordpress-plugins-st-daily-tip/"><?php _e('Donate', 'stemail')?></a>
 							</div>
 						</div>
 						<div id="toc" class="postbox">
 						<div class="handlediv" title="Click to toggle"><br /></div>
-							<h3 class="hndle"><span>Connect With Us </span></h3>
+							<h3 class="hndle"><span><?php _e('Connect With Us ', 'stemail')?></span></h3>
 							<div class="inside">
 							<a class="facebook" href="https://www.facebook.com/sanskrutitech"></a>
 							<a class="twitter" href="https://twitter.com/#!/sanskrutitech"></a>
@@ -185,7 +181,7 @@ function st_email_read_dump($src_file,$table_name,$column_string="",$start_row=2
 	$errorMsg = "";
 	if(empty($src_file))
 	{
-            $errorMsg .= "<br />Input file is not specified";
+            $errorMsg .= "<br />" . _e('Input file is not specified', 'stemail');
             return $errorMsg;
     }
 	
@@ -194,8 +190,8 @@ function st_email_read_dump($src_file,$table_name,$column_string="",$start_row=2
 	$file_handle = fopen($file_path, "r");
 	if ($file_handle === FALSE) {
 		// File could not be opened...
-		$errorMsg .= 'Source file could not be opened!<br />';
-		$errorMsg .= "Error on fopen('$file_path')";	// Catch any fopen() problems.
+		$errorMsg .= _e('Source file could not be opened!', 'stemail') . '<br />';
+		$errorMsg .= _e('Error on fopen', 'stemail') .  "('$file_path')";	// Catch any fopen() problems.
 		return $errorMsg;
 	}
 	
@@ -226,7 +222,7 @@ function st_email_read_dump($src_file,$table_name,$column_string="",$start_row=2
                         $results = $wpdb->query($query);
                         if(empty($results))
                         {
-                            $errorMsg .= "<br />Insert into the Database failed for the following Query:<br />";
+                            $errorMsg .= "<br />" . _e('Insert into the Database failed for the following Query: ', 'stemail') . " <br />";
                             $errorMsg .= $query;
                         }
 	    }
@@ -264,13 +260,13 @@ function st_category_email_subscribe_subscribers_page() {
 			if(empty($errorMsg))
 			{
 				echo '<div id="message" class="updated fade"><p><strong>';
-				echo 'File content has been successfully imported into the database!';
+				echo _e('File content has been successfully imported into the database!', 'stemail');
 				echo '</strong></p></div>';
 			}
 			else
 			{
 				echo '<div id="message" class="error"><p><strong>';
-				echo "Error occured while trying to import!<br />";
+				echo _e('Error occured while trying to import!', 'stemail') . "<br />";
 				echo $errorMsg;
 				echo '</strong></p></div>';
 			}
@@ -278,7 +274,7 @@ function st_category_email_subscribe_subscribers_page() {
 		else
 		{
 			echo '<div id="message" class="error"><p><strong>';
-			echo "There was an error uploading the file, please try again!";
+			echo _e('There was an error uploading the file, please try again!', 'stemail') ;
 			echo '</strong></p></div>';
 		}		
 	}
@@ -295,7 +291,7 @@ function st_category_email_subscribe_subscribers_page() {
 		$st_category = check_input($_REQUEST["st_category"]); 
 		//Insert
 		$rows_affected = $wpdb->insert( $table_name, array( 'st_name' => $sub_name, 'st_email' => $sub_email,'st_category' => $st_category));
-		echo "<div id=\"message\" class=\"updated fade\"><p><strong>Subscriber Added Successfully!</strong></p></div>";
+		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . _e('Subscriber Added Successfully!', 'stemail') . "</strong></p></div>";
 	}
 	if (isset($_REQUEST['Unsubscribe'])) {
 		if(isset($_REQUEST['checkbox']))
@@ -306,25 +302,24 @@ function st_category_email_subscribe_subscribers_page() {
 				$wpdb->query("DELETE FROM $table_name WHERE st_id = " .$chkid."");
 				$i++;
 			}
-			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$i Emails(s) Unsubscribed Successfully!</strong></p></div>";
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$i " . _e('Emails(s) Unsubscribed Successfully!','stemail'). "</strong></p></div>";
 		}
 	}
 	?>
 		<div class="wrap">  
-			<h2>Category Email Subscribe Plugin</h2>
+			<h2><?php _e('Category Email Subscribe Plugin','stemail')?></h2>
 			<div class="postbox-container" style="width:70%;padding-right:25px;">
 				<div class="metabox-holder">
 					<div class="meta-box-sortables">
 						<div id="toc" class="postbox">
 							<div class="handlediv" title="Click to toggle"><br /></div>
-							<h3 class="hndle"><span>Subscribers</span></h3>
+							<h3 class="hndle"><span><?php _e('Subscribers','stemail')?></span></h3>
 							<div class="inside">
 								<?php
 									
 									$table_result = $wpdb->get_results("SELECT * FROM $table_name ");
 									echo "<form id=\"st_subscriber\" action=\"" .$_SERVER["PHP_SELF"] . "?page=st_category_email_subscriber\" method=\"post\">";
 									echo "<div class=\"dataTables_wrapper\" role=\"grid\">";
-									//echo "<a href=\"".plugin_dir_url(__FILE__)."st_category_email_subscribe_export_csv.php"."\" class=\"button\" style=\"color:#41411D;float:right;\">Export to CSV</a>";
 									echo "<table class=\"display sortable\" id=\"display_data\" style=\"width:100%;\" >";
 									echo "<thead><th class=\"unsortable\"><span><input type='checkbox' name='checkall' onclick='checkedAll();'/> Select All<span/> </th><th>Id</th><th>Name</th><th>Email</th><th>Category</th></tr></thead>";	
 									echo "<tbody>";
@@ -350,12 +345,12 @@ function st_category_email_subscribe_subscribers_page() {
 						<div class="meta-box-sortables">
 							<div id="toc" class="postbox">
 								<div class="handlediv" title="Click to toggle"><br /></div>
-								<h3 class="hndle"><span>Import Subscribers</span></h3>
+								<h3 class="hndle"><span><?php _e('Import Subscribers','stemail')?></span></h3>
 								<div class="inside">
 									<form id="upload" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="POST">
 										<input type="hidden" name="file_upload" id="file_upload" value="true" />
 										<input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
-										<strong>Choose a CSV file to upload: </strong><input name="csvfile" id="csvfile" type="file" size="25" />
+										<strong><?php _e('Choose a CSV file to upload: ','stemail')?></strong><input name="csvfile" id="csvfile" type="file" size="25" />
 										<input type="submit" class="button-primary" name="UploadFile" value="Upload File" />
 									</form>
 								</div>
@@ -364,19 +359,19 @@ function st_category_email_subscribe_subscribers_page() {
 						<div class="meta-box-sortables">
 							<div id="toc" class="postbox">
 								<div class="handlediv" title="Click to toggle"><br /></div>
-								<h3 class="hndle"><span>Add a Subscriber</span></h3>
+								<h3 class="hndle"><span><?php _e('Add a Subscriber','stemail')?></span></h3>
 								<div class="inside">
 									<form id="add_subscriber" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="post">
 										<div>
-											<label>Name</label>
+											<label><?php _e('Name','stemail')?></label>
 											<input name="sub_name" class="regular-text code" value=""/>
 										</div>
 										<div>
-											<label>Email</label>
+											<label><?php _e('Email','stemail')?></label>
 											<input name="sub_email" class="regular-text code" value=""/>
 										</div>
 										<div>
-											<label for="st_category">Category</label>
+											<label for="st_category"><?php _e('Category','stemail')?></label>
 											<?php echo wp_dropdown_categories("name=st_category&id=st_category&show_option_all=All Categories&echo=0&hide_empty=0&hierarchical=1")?>
 										<input type="submit" class="button-primary" name="Subscribe"  value="Subscribe" />
 									</form>

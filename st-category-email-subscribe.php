@@ -3,8 +3,8 @@
 	Plugin Name: St Category Email Subscribe
 	Plugin URI: http://www.sanskrutitech.in
 	Description: Plugin that allows Users to Subscribe for Emails based on Category.They will receive an email when a post is published in the category they have subscribed to.
-	Author: Dhara Shah
 	Version: 0.1
+	Author: Sanskruti Technologies
 	Author URI: http://www.sanskrutitech.in
 	Author Email: dhara@sanskrutitech.in
 	License: GPL
@@ -45,6 +45,11 @@
 
 if (!defined('ABSPATH')) { exit; }
 
+add_action( 'plugins_loaded', 'st_email_load_textdomain' );
+
+function st_email_load_textdomain() {
+	load_plugin_textdomain('stemail', false,  dirname( plugin_basename( __FILE__ ) ) . "/language/");
+}	
 
 define('WP_ST_CATEGORY_EMAIL_FOLDER', dirname(plugin_basename(__FILE__)));
 define('WP_ST_CATEGORY_EMAIL_URL', plugins_url('', __FILE__));
@@ -116,7 +121,7 @@ function st_category_email_subscribe_form($atts){
 	if ($_POST['st_subscribe_form'] && $thankyou) { 
 		if (!is_email($_POST['st_email']))
 		{
-			$return .= '<p class="st_error">Please Check.Email Address is Invalid</p>'; 
+			$return .= '<p class="st_error">' . _e('Please Check.Email Address is Invalid','stemail') . '</p>'; 
 		}elseif ($thankyou){
 			if ($jsthanks) {
 				$return .= "<script>window.onload = function() { alert('".$thankyou."'); }</script>";
@@ -138,17 +143,17 @@ function st_category_email_subscribe_form($atts){
 
 function st_category_email_subscribe_shortcode($atts=array()){
 	$atts = shortcode_atts(array(
-		"prepend" => 'Subscribe to receive posts in email',  
+		"prepend" => _e('Subscribe to receive posts in email','stemail'),  
         "showname" => true,
-		"nametxt" => 'Name:',
-		"nameholder" => 'Name...',
-		"emailtxt" => 'Email:',
-		"emailholder" => 'Email Address...',
+		"nametxt" => _e('Name:','stemail'),
+		"nameholder" => _e('Name...','stemail'),
+		"emailtxt" => _e('Email:','stemail'),
+		"emailholder" => _e('Email Address...','stemail'),
 		"showcategory" => true,
-		"categorytxt" => 'Category:',
-		"submittxt" => 'Submit',
+		"categorytxt" => _e('Category:','stemail'),
+		"submittxt" => _e('Submit','stemail'),
 		"jsthanks" => false,
-		"thankyou" => 'Thank you for subscribing to our mailing list'
+		"thankyou" => _e('Thank you for subscribing to our mailing list','stemail')
     ), $atts);
 	
 	return st_category_email_subscribe_form($atts);
@@ -279,10 +284,10 @@ function st_send_email($post_ID){
 		'st_category_email_subscribe_widget', 
 
 		// Widget name will appear in UI
-		__('Category Email Subscribe Form', 'st_category_email_subscribe_domain'), 
+		__('Category Email Subscribe Form', 'stemail'), 
 
 		// Widget description
-		array( 'description' => __( 'An Widget that display Subscriber Form', 'st_category_email_subscribe_domain' ), ) 
+		array( 'description' => __( 'An Widget that display Subscriber Form', 'stemail' ), ) 
 		);
 	}
 
@@ -334,17 +339,17 @@ function st_send_email($post_ID){
 	function form( $instance ) 
 	{
 		/* Set up some default widget settings. */
-		$defaults = array( 	'prepend' => 'Subscribe to receive updates in email',
+		$defaults = array( 	'prepend' => _e('Subscribe to receive updates in email','stemail'),
 							'showname' => '1',
-							'nametxt' => 'Name:',
-							'nameholder' => 'Name...',
-							'emailtxt' => 'Email:',
-							'emailholder' => 'Email Address...',
+							'nametxt' => _e('Name:','stemail'),
+							'nameholder' => _e('Name...','stemail'),
+							'emailtxt' => _e('Email:','stemail'),
+							'emailholder' => _e('Email Address...','stemail'),
 							'showcategory' => '1',
-							'categorytxt' => 'Category:',
-							'submittxt' => 'Submit',
+							'categorytxt' => _e('Category:','stemail'),
+							'submittxt' => _e('Submit','stemail'),
 							'jsthanks' => '0',
-							'thankyou' => 'Thank you for subscribing to our mailing list');
+							'thankyou' => _e('Thank you for subscribing to our mailing list','stemail'));
 		$instance = wp_parse_args( $instance, $defaults );
 		
 	?>
