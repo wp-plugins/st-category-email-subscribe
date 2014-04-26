@@ -4,7 +4,7 @@ Donate link: http://sanskrutitech.in/index.php/wordpress-plugins/
 Tags: subscribe, email, category
 Requires at least: 3.3.1
 Tested up to: 3.9
-Stable tag: 0.2
+Stable tag: 0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,10 +57,17 @@ c. Upload using CSV File
 = 0.2 =
 * Translate ready
 
+= 0.3 =
+* Bug Fix in Widget
+
+
 
 == Upgrade Notice ==
-= 0.1 =
+= 0.2 =
 * Now the plugin is translate ready. Sample translation in Spanish is included.
+
+= 0.3 =
+* Problem of Widget merging with other widget solved
 
 
 

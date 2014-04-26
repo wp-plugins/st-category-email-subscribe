@@ -3,7 +3,7 @@
 	Plugin Name: St Category Email Subscribe
 	Plugin URI: http://www.sanskrutitech.in
 	Description: Plugin that allows Users to Subscribe for Emails based on Category.They will receive an email when a post is published in the category they have subscribed to.
-	Version: 0.2
+	Version: 0.3
 	Author: Sanskruti Technologies
 	Author URI: http://www.sanskrutitech.in
 	Author Email: dhara@sanskrutitech.in
@@ -24,27 +24,24 @@
 	
   TO Do :
 
-  110	Upload in Wordpress Plugin Directory
-  120 	Allow to edit subscriber
-  130	Logs of Email Sent. Failures etc...  
-  150	Install @ Jeevanbharati
-  160	Import Subscribers
-  170	Send Email when someone subscribes. According to setting
-  180	Send Email when someone unsubscribes
-  190	Send Email of Log of Email sends
-  200	How to Import Export Category
-  210	Send Email to user for confirmation
-  220	Allow to select multiple categories
-  230	Allow user to update their subscription / unsubscribe
+  100 	Allow to edit subscriber
+  110	Logs of Email Sent. Failures etc...  
+  120	Import Subscribers
+  130	Send Email when someone subscribes. According to setting
+  140	Send Email when someone unsubscribes. According to setting
+  150	Send Email of Log of Email sends
+  160	How to Import Export Category
+  170	Send Email to user for confirmation
+  180	Allow to select multiple categories
+  190	Allow user to update their subscription / unsubscribe
  */
  
 
-/**
- * 1. If no Wordpress, go home
- */
+/* If no Wordpress, go home */
 
 if (!defined('ABSPATH')) { exit; }
 
+/* Load Language */
 add_action( 'plugins_loaded', 'st_email_load_textdomain' );
 
 function st_email_load_textdomain() {
@@ -301,6 +298,8 @@ function st_send_email($post_ID){
 		extract($args);
 		
 		$title=apply_filters('widget_title',$instance['title']);
+		echo $args['before_widget'];
+
 		if ( $title )
 		{
 			echo $before_title . $title . $after_title;
@@ -310,6 +309,8 @@ function st_send_email($post_ID){
 		
 		
 		echo st_category_email_subscribe_form($instance);
+		echo $args['after_widget'];
+
 	}
 	 
 	 function update( $new_instance, $old_instance ) {

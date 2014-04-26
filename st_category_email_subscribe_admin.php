@@ -291,7 +291,7 @@ function st_category_email_subscribe_subscribers_page() {
 		$st_category = check_input($_REQUEST["st_category"]); 
 		//Insert
 		$rows_affected = $wpdb->insert( $table_name, array( 'st_name' => $sub_name, 'st_email' => $sub_email,'st_category' => $st_category));
-		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . _e('Subscriber Added Successfully!', 'stemail') . "</strong></p></div>";
+		echo "<div id=\"message\" class=\"updated fade\"><p><strong>Subscriber Added Successfully!</strong></p></div>";
 	}
 	if (isset($_REQUEST['Unsubscribe'])) {
 		if(isset($_REQUEST['checkbox']))
@@ -302,7 +302,7 @@ function st_category_email_subscribe_subscribers_page() {
 				$wpdb->query("DELETE FROM $table_name WHERE st_id = " .$chkid."");
 				$i++;
 			}
-			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$i " . _e('Emails(s) Unsubscribed Successfully!','stemail'). "</strong></p></div>";
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$i Emails(s) Unsubscribed Successfully!</strong></p></div>";
 		}
 	}
 	?>
