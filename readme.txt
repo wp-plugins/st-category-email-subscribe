@@ -4,7 +4,7 @@ Donate link: http://sanskrutitech.in/index.php/wordpress-plugins/
 Tags: subscribe, email, category
 Requires at least: 3.3.1
 Tested up to: 3.9
-Stable tag: 0.3
+Stable tag: 0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,8 @@ c. Upload using CSV File
 = 0.3 =
 * Bug Fix in Widget
 
+= 0.4 =
+* Bug Fix in Admin Panel
 
 
 == Upgrade Notice ==
@@ -68,6 +70,9 @@ c. Upload using CSV File
 
 = 0.3 =
 * Problem of Widget merging with other widget solved
+
+= 0.4 =
+* Problem in inserting Subscriber
 
 
 

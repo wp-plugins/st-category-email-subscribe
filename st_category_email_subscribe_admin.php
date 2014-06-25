@@ -12,6 +12,14 @@ function st_category_email_admin_menu() {
 add_action('admin_menu', 'st_category_email_admin_menu');
 add_action('init', 'st_category_email_subscribe_export_csv');
 
+function st_category_email_subscribe_check_input($data)
+{
+    $data = trim($data);
+    $data = stripslashes($data);
+    
+    return $data;
+}
+
 function st_category_email_subscribe_export_csv(){
 	if(isset($_REQUEST['ExportCSV']))
 	{
@@ -286,9 +294,9 @@ function st_category_email_subscribe_subscribers_page() {
 	//Store the Data input if data is submitted
 	if (isset($_REQUEST['Subscribe'])) { 
 		
-		$sub_name = check_input($_REQUEST["sub_name"]);
-		$sub_email = check_input($_REQUEST["sub_email"]); 
-		$st_category = check_input($_REQUEST["st_category"]); 
+		$sub_name = st_category_email_subscribe_check_input($_REQUEST["sub_name"]);
+		$sub_email = st_category_email_subscribe_check_input($_REQUEST["sub_email"]); 
+		$st_category = st_category_email_subscribe_check_input($_REQUEST["st_category"]); 
 		//Insert
 		$rows_affected = $wpdb->insert( $table_name, array( 'st_name' => $sub_name, 'st_email' => $sub_email,'st_category' => $st_category));
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>Subscriber Added Successfully!</strong></p></div>";
