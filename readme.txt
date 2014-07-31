@@ -76,6 +76,7 @@ c. Upload using CSV File
 
 = 0.5 =
 * Addition of French Language
+  Special thanks to Guillaume de Bure for the translation
 
 
 
