@@ -3,7 +3,7 @@
 	Plugin Name: St Category Email Subscribe
 	Plugin URI: http://www.sanskrutitech.in
 	Description: Plugin that allows Users to Subscribe for Emails based on Category.They will receive an email when a post is published in the category they have subscribed to.
-	Version: 0.5
+	Version: 0.6
 	Author: Sanskruti Technologies
 	Author URI: http://www.sanskrutitech.in
 	Author Email: dhara@sanskrutitech.in
@@ -56,7 +56,10 @@ define('WP_ST_CATEGORY_EMAIL_URL', plugins_url('', __FILE__));
  */
  
 global $st_email_table_suffix;
+global $st_category_email_db_ver;
 
+
+$st_category_email_db_ver = "0.6";
 $st_email_table_suffix = "st_category_email";
 
 /**
@@ -67,21 +70,43 @@ register_activation_hook(__FILE__, 'st_category_email_install');
 register_deactivation_hook(__FILE__, 'st_category_email_uninstall');
 
 function st_category_email_install() {
-	//Create table for subscribers
 	global $wpdb;
+	global $st_category_email_db_ver;
 	global $st_email_table_suffix;
 	
-    $table_name = $wpdb->prefix . $st_email_table_suffix;
-    $sql = "CREATE TABLE $table_name  (
-        st_id INT(9) NOT NULL AUTO_INCREMENT,
-        st_name VARCHAR(200),
-        st_email VARCHAR(200) NOT NULL,
-		st_category bigint(20),
-		UNIQUE KEY st_id (st_id)
-    );";
+	$st_email_table = $wpdb->prefix . $st_email_table_suffix;
 	
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-	dbDelta($sql);
+	$db_ver=get_option('st_category_email_db_ver',"0.5");
+	$db_ver=(float) $db_ver;
+
+	$st_category_email_db_ver = (float) $st_category_email_db_ver;
+	
+	/** If Updating from an older version */
+	if($db_ver < $st_category_email_db_ver)
+	{
+		if($db_ver == "0.5"){
+			$sql = "ALTER TABLE $st_email_table CHANGE st_category st_category VARCHAR(100);";
+			$wpdb->query($sql);
+		}
+	}
+	/* If new installation*/ 
+	else{
+		//Create table for subscribers
+		$sql = "CREATE TABLE $st_email_table  (
+			st_id INT(9) NOT NULL AUTO_INCREMENT,
+			st_name VARCHAR(200),
+			st_email VARCHAR(200) NOT NULL,
+			st_category bigint(20),
+			UNIQUE KEY st_id (st_id)
+		);";
+	
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		dbDelta($sql);
+	}
+	
+	//Set DB Version
+	update_option("st_category_email_db_ver", $st_category_email_db_ver);
+	
     //Set Send Email
 	update_option( 'st_category_email_send_email', get_option('admin_email') );
 	
@@ -90,8 +115,9 @@ function st_category_email_install() {
 }
 
 function st_category_email_uninstall() {
-    
+	/** Do Nothing **/	
 }
+
 /** Short Code to display Subscription Form **/
 add_shortcode("st_category_subscribe_form", "st_category_email_subscribe_shortcode");
 
@@ -101,11 +127,28 @@ if (is_admin()) {
     add_action('admin_print_scripts', 'st_category_email_subscribe_admin_scripts');
 }
 function st_category_email_subscribe_admin_scripts() {
-	wp_register_script('checkuncheck.js',WP_ST_CATEGORY_EMAIL_URL.'/scripts/checkuncheck.js');
-	wp_enqueue_script('checkuncheck.js');
-	
 	wp_register_style('st-category-email-style.css',WP_ST_CATEGORY_EMAIL_URL.'/css/style.css');
 	wp_enqueue_style('st-category-email-style.css');
+	
+	wp_register_style('st-category-email-multiple-select.css',WP_ST_CATEGORY_EMAIL_URL.'/css/multiple-select.css');
+	wp_enqueue_style('st-category-email-multiple-select.css');
+	
+	wp_enqueue_script('jquery');
+	
+	wp_enqueue_script( 'st-category-email-jquery.multiple.select.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/jquery.multiple.select.js', array(), '1.0.0', true );
+	wp_enqueue_script( 'st-category-email-jquery.csv.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/jquery.csv-0.71.min.js', array(), '1.0.0', true );
+	wp_enqueue_script( 'st-category-email-admin_scripts.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/admin_scripts.js', array(), '1.0.0', true );
+}
+
+add_action( 'wp_enqueue_scripts', 'st_category_email_subscribe_scripts' );
+
+function st_category_email_subscribe_scripts() {
+	wp_register_style('st-category-email-multiple-select.css',WP_ST_CATEGORY_EMAIL_URL.'/css/multiple-select.css');
+	wp_enqueue_style('st-category-email-multiple-select.css');
+	
+	wp_enqueue_script('jquery');
+	wp_enqueue_script( 'st-category-email-jquery.multiple.select.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/jquery.multiple.select.js', array(), '1.0.0', true );
+	wp_enqueue_script( 'st-category-email-scripts.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/scripts.js', array(), '1.0.0', true );
 }
 
 function st_category_email_subscribe_form($atts){
@@ -130,7 +173,10 @@ function st_category_email_subscribe_form($atts){
 	
 	if ($showname) $return .= '<p class="st_name"><label class="st_namelabel" for="st_name">'.$nametxt.'</label><input class="st_nameinput" placeholder="'.$nameholder.'" name="st_name" type="text" value=""></p>';
 	$return .= '<p class="st_email"><label class="st_emaillabel" for="st_email">'.$emailtxt.'</label><input class="st_emailinput" name="st_email" placeholder="'.$emailholder.'" type="text" value=""></p>';
-	if ($showcategory) $return .= '<p class="st_category"><label class="st_categorylabel" for="st_category">'.$categorytxt.'</label><br/>'  . wp_dropdown_categories("name=st_category&id=st_category&show_option_all=All Categories&echo=0&hide_empty=0&hierarchical=1"). '</p>';
+	
+	$select_cats = wp_dropdown_categories("name=st_category[]&id=st_category&echo=0&hide_empty=0&hierarchical=1");	
+	$select_cats = str_replace( 'id=', 'multiple="multiple" id=', $select_cats );
+	if ($showcategory) $return .= '<p class="st_category"><label class="st_categorylabel" for="st_category">'.$categorytxt.'</label><br/>'  . $select_cats . '</p>';
 	$return .= '<p class="st_submit"><input name="submit" class="btn st_submitbtn" type="submit" value="'.($submittxt?$submittxt:'Submit').'"></p>';
 	
 	$return .= '</form>';
@@ -160,16 +206,17 @@ if ($_POST['st_subscribe_form']) {
 	
 	global $wpdb;
 	global $st_email_table_suffix;
-    $table_name = $wpdb->prefix . $st_email_table_suffix;
+    $subscribers_table = $wpdb->prefix . $st_email_table_suffix;
 	
 	$name = $_POST['st_name'];
 	$email = $_POST['st_email'];
 	$category = $_POST['st_category'];
-	
+	$category = implode(",",$_POST['st_category']);
+	echo $category;
 	if (is_email($email)) {
-		$exists = mysql_query("SELECT * FROM ".$table_name." where st_email like '".esc_sql($email)."' limit 1");
+		$exists = mysql_query("SELECT * FROM ".$subscribers_table." where st_email like '".esc_sql($email)."' limit 1");
 		if (mysql_num_rows($exists) <1) {
-			$wpdb->query("insert into ".$table_name." (st_name, st_email,st_category) values ('".esc_sql($name)."', '".esc_sql($email)."',".$category.")");
+			$wpdb->insert($subscribers_table,array('st_name'=>esc_sql($name), 'st_email'=>esc_sql($email),'st_category'=>$category));
 		}
 	}
 }
@@ -407,7 +454,7 @@ function st_send_email($post_ID){
  
  /**
  * Register our widget.
- * 'st_daily_tip_load_widget' is the widget class used below.
+ * 'st_category_email_subscribe_load_widget' is the widget class used below.
  */
  function st_category_email_subscribe_load_widget()
  {

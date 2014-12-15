@@ -3,8 +3,8 @@ Contributors: dharashah
 Donate link: http://sanskrutitech.in/index.php/wordpress-plugins/
 Tags: subscribe, email, category
 Requires at least: 3.3.1
-Tested up to: 3.9
-Stable tag: 0.5
+Tested up to: 4.0.1
+Stable tag: 0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,29 +54,30 @@ c. Upload using CSV File
 5. 	You can Unsubscribe the Subscriber by select the emails and using the **Unsubscribe** button 
 
 == Changelog ==
+= 0.6 =
+* Allow multiple categories selection
+= 0.5 =
+* French Translation Added
+= 0.4 =
+* Bug Fix in Admin Panel
+= 0.3 =
+* Bug Fix in Widget
 = 0.2 =
 * Translate ready
 
-= 0.3 =
-* Bug Fix in Widget
-
-= 0.4 =
-* Bug Fix in Admin Panel
-
-
 == Upgrade Notice ==
-= 0.2 =
-* Now the plugin is translate ready. Sample translation in Spanish is included.
-
-= 0.3 =
-* Problem of Widget merging with other widget solved
-
-= 0.4 =
-* Problem in inserting Subscriber
-
+= 0.6 =
+* Now visitors can opt into multiple categories.
 = 0.5 =
 * Addition of French Language
   Special thanks to Guillaume de Bure for the translation
+= 0.4 =
+* Problem in inserting Subscriber Solved
+= 0.3 =
+* Problem of Widget merging with other widget solved
+= 0.2 =
+* Now the plugin is translate ready. Sample translation in Spanish is included.
+
 
 
 

@@ -1,11 +1,11 @@
 <?php
 
 global $st_email_table_suffix;
-
 $st_email_table_suffix = "st_category_email";
 
 function st_category_email_admin_menu() {
     add_menu_page('St Category Email Subscribe', 'St Category Email Subscribe', 'manage_options', 'st_category_email_subscribe', 'st_category_email_subscribe_settings_page', plugins_url('st-category-email-subscribe/images/icon.png'));
+	add_submenu_page('st_category_email_subscribe', 'Settings', 'Settings', 'manage_options', 'st_category_email_subscribe', 'st_category_email_subscribe_settings_page');
 	add_submenu_page('st_category_email_subscribe', 'Subscribers', 'Subscribers', 'manage_options', 'st_category_email_subscriber', 'st_category_email_subscribe_subscribers_page');
 }
 
@@ -76,8 +76,179 @@ function st_category_email_subscribe_generate($getTable){
 		return $fields;
   }
 }
+if( ! class_exists( 'WP_List_Table' ) ) {
+    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+class Subscribers_Table extends WP_List_Table
+{
+	/* Prepare the items for the table to process
+     *
+     * @return Void
+     */
+    public function prepare_items()
+    {
+        $columns = $this->get_columns();
+        $hidden = $this->get_hidden_columns();
+        $sortable = $this->get_sortable_columns();
 
+        $data = $this->table_data();
+		usort( $data, array( &$this, 'sort_data' ) );
+
+		$perPage = 20;
+        $currentPage = $this->get_pagenum();
+        $totalItems = count($data);
+		
+		$this->set_pagination_args( array(
+            'total_items' => $totalItems,
+            'per_page'    => $perPage
+        ) );
+		
+		$data = array_slice($data,(($currentPage-1)*$perPage),$perPage);
+		
+        $this->_column_headers = array($columns, $hidden, $sortable);
+        $this->items = $data;
+    }
+	/**
+     * Override the parent columns method. Defines the columns to use in your listing table
+     *
+     * @return Array
+     */
+    public function get_columns()
+    {
+        $columns = array(
+            'id'          	=> 'ID',
+			'st_name'  		=> 'Name',
+            'st_email'  	=> 'Email',
+			'st_category'  	=> 'Categories',
+            'actions'      	=> 'Action'
+        );
+		
+		return $columns;
+    }
+	/**
+     * Define which columns are hidden
+     *
+     * @return Array
+     */
+    public function get_hidden_columns()
+    {
+        return array('id');
+    }
+	/**
+     * Define the sortable columns
+     *
+     * @return Array
+     */
+    public function get_sortable_columns()
+    {
+        return array('st_name' 		=> array('st_name', true),
+					 'st_email' 	=> array('st_email', true),
+					);
+    }
+	/**
+     * Get the table data
+     *
+     * @return Array
+     */
+    private function table_data()
+    {
+		$this_page = $_SERVER['PHP_SELF']."?page=st_category_email_subscriber";
+		
+		global $wpdb;	
+		global $st_email_table_suffix;	
+	
+		$st_email_table = $wpdb->prefix . $st_email_table_suffix;
+
+        $data = array();
+
+		$sql = "SELECT * FROM $st_email_table;";
+		$st_subscribers = $wpdb->get_results($sql);
+		
+		foreach ( $st_subscribers as $subscriber ) {
+			$st_list_category= "";
+			if($subscriber->st_category == 0){
+				$st_category = "All Categories";
+			}else{
+				
+				$st_categories = explode(",",$subscriber->st_category);
+				foreach($st_categories as $st_category){
+					$st_list_category .= get_cat_name($st_category)." ";
+				}
+				
+			}
+			$data[] = array(
+                    'id'          => $subscriber->st_id,
+					'st_name'	  => $subscriber->st_name,
+                    'st_email'    => $subscriber->st_email,
+					'st_category' => $st_list_category,
+                    'actions' 	  => "<a href='#' st_id='".$subscriber->st_id."' st_name='".$subscriber->st_name."' st_email='".$subscriber->st_email."' st_category='".$subscriber->st_category."' class='edit_this_subscriber'>Edit</a> | <a href='".$this_page."&action=delete&delete_id=".$subscriber->st_id."'>Delete</a>"
+               );
+			}
+        return $data;
+    }
+	// Used to display the value of the id column
+	public function column_id($item)
+	{
+		return $item['id'];
+	}
+	
+	/**
+     * Define what data to show on each column of the table
+     *
+     * @param  Array $item        Data
+     * @param  String $column_name - Current column name
+     *
+     * @return Mixed
+     */
+    public function column_default( $item, $column_name )
+    {
+        switch( $column_name ) {
+            case 'id':
+			case 'st_name':
+            case 'st_email':
+			case 'st_category':
+            case 'actions':
+                return $item[ $column_name ];
+
+            default:
+                return print_r( $item, true ) ;
+        }
+    }
+	/**
+     * Allows you to sort the data by the variables set in the $_GET
+     *
+     * @return Mixed
+     */
+    private function sort_data( $a, $b )
+    {
+        // Set defaults
+        $orderby = 'member';
+        $order = 'asc';
+
+        // If orderby is set, use this as the sort column
+        if(!empty($_GET['orderby']))
+        {
+            $orderby = $_GET['orderby'];
+        }
+
+        // If order is set use this as the order
+        if(!empty($_GET['order']))
+        {
+            $order = $_GET['order'];
+        }
+
+        $result = strnatcmp( $a[$orderby], $b[$orderby] );
+
+        if($order === 'asc')
+        {
+            return $result;
+        }
+
+        return -$result;
+    }
+}
 function st_category_email_subscribe_settings_page() {
+
 	$send_email = get_option( 'st_category_email_send_email' );
 	$from_name = get_option( 'st_category_email_from_name' );
 	
@@ -141,7 +312,7 @@ function st_category_email_subscribe_settings_page() {
 							<h3 class="hndle"><span><?php _e('Show your Support', 'stemail')?></span></h3>
 							<div class="inside">
 								<p>
-								<strong><?php _e('Want to help make this plugin even better? All donations are used to improve this plugin, so donate $20, $50 or $100 now!', 'stemail')?></strong>
+								<strong><?php _e('Want to help make this plugin even better? All donations are used to improve this plugin, so donate now!', 'stemail')?></strong>
 								</p>
 								<a href="http://sanskrutitech.in/wordpress-plugins/wordpress-plugins-st-daily-tip/"><?php _e('Donate', 'stemail')?></a>
 							</div>
@@ -150,9 +321,11 @@ function st_category_email_subscribe_settings_page() {
 						<div class="handlediv" title="Click to toggle"><br /></div>
 							<h3 class="hndle"><span><?php _e('Connect With Us ', 'stemail')?></span></h3>
 							<div class="inside">
-							<a class="facebook" href="https://www.facebook.com/sanskrutitech"></a>
-							<a class="twitter" href="https://twitter.com/#!/sanskrutitech"></a>
-							<a class="googleplus" href="https://plus.google.com/107541175744077337034/posts"></a>
+								<a class="facebook" href="https://www.facebook.com/sanskrutitech"></a>
+								<a class="twitter" href="https://twitter.com/#!/sanskrutitech"></a>
+								<a class="googleplus" href="https://plus.google.com/107541175744077337034/posts"></a>
+								<a class="website" href="http://sanskrutitech.in/"></a>
+								<a class="email" href="mailto:info@sanskrutitech.in"></a>
 							</div>
 						</div>
 					</div>
@@ -182,7 +355,7 @@ function st_email_get_abs_path_from_src_file($src_file)
 	}
 	return $abs_path;
 }
-function st_email_read_dump($src_file,$table_name,$column_string="",$start_row=2)
+function st_email_read_dump($src_file,$st_email_table,$column_string="",$start_row=2)
 {
 	ini_set('auto_detect_line_endings', true);
 	global $wpdb;
@@ -225,7 +398,7 @@ function st_email_read_dump($src_file,$table_name,$column_string="",$start_row=2
 	                $query_vals .= ",'".esc_sql($line_of_text[$c])."'";
 					
 	        	}
-	        	        $query = "INSERT INTO $table_name ($column_string) VALUES ($query_vals)";
+	        	        $query = "INSERT INTO $st_email_table ($column_string) VALUES ($query_vals)";
 						
                         $results = $wpdb->query($query);
                         if(empty($results))
@@ -245,7 +418,7 @@ function st_category_email_subscribe_subscribers_page() {
 	global $wpdb;
 	global $st_email_table_suffix;	
 	
-	$table_name = $wpdb->prefix . $st_email_table_suffix;
+	$st_email_table = $wpdb->prefix . $st_email_table_suffix;
 	$column_string = "st_name,st_email,st_category";
 	
 
@@ -262,7 +435,7 @@ function st_category_email_subscribe_subscribers_page() {
 		{
 			$file_name = $target_path . "/" . $name;
 			
-			$errorMsg = st_email_read_dump($file_name,$table_name,$column_string);
+			$errorMsg = st_email_read_dump($file_name,$st_email_table,$column_string);
 	
 		
 			if(empty($errorMsg))
@@ -289,7 +462,7 @@ function st_category_email_subscribe_subscribers_page() {
 	global $wpdb;
 	global $st_email_table_suffix;
 
-	$table_name = $wpdb->prefix . $st_email_table_suffix;
+	$st_email_table = $wpdb->prefix . $st_email_table_suffix;
 	
 	//Store the Data input if data is submitted
 	if (isset($_REQUEST['Subscribe'])) { 
@@ -298,19 +471,34 @@ function st_category_email_subscribe_subscribers_page() {
 		$sub_email = st_category_email_subscribe_check_input($_REQUEST["sub_email"]); 
 		$st_category = st_category_email_subscribe_check_input($_REQUEST["st_category"]); 
 		//Insert
-		$rows_affected = $wpdb->insert( $table_name, array( 'st_name' => $sub_name, 'st_email' => $sub_email,'st_category' => $st_category));
+		$rows_affected = $wpdb->insert( $st_email_table, array( 'st_name' => $sub_name, 'st_email' => $sub_email,'st_category' => $st_category));
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>Subscriber Added Successfully!</strong></p></div>";
 	}
-	if (isset($_REQUEST['Unsubscribe'])) {
-		if(isset($_REQUEST['checkbox']))
+	if (isset($_REQUEST['action'])) {
+		if(isset($_REQUEST['delete_id']))
 		{
-			$i=0;
-			foreach($_REQUEST['checkbox']  as $chkid)
-			{
-				$wpdb->query("DELETE FROM $table_name WHERE st_id = " .$chkid."");
-				$i++;
-			}
-			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$i Emails(s) Unsubscribed Successfully!</strong></p></div>";
+			$st_id = $_REQUEST['delete_id'];
+			
+			$row_deleted = $wpdb->delete($st_email_table,array( 'st_id' => $st_id ));
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$row_deleted Emails(s) Deleted Successfully!</strong></p></div>";
+		}
+	}
+	if (isset($_REQUEST['Save'])) {
+		$edit_st_id =  $_REQUEST['edit_st_id'];
+		$edit_st_name =  $_REQUEST['edit_st_name'];
+		$edit_st_email =  $_REQUEST['edit_st_email'];
+		$edit_st_category = "";
+		if(isset($_REQUEST['edit_st_category'])){
+			$edit_st_category =  $_REQUEST['edit_st_category'];
+			$edit_st_category = implode(",",$edit_st_category);
+		}
+
+		$row_updated = $wpdb->update($st_email_table,array('st_name'=>$edit_st_name,'st_email'=>$edit_st_email,'st_category'=>$edit_st_category),array( 'st_id' => $edit_st_id ));
+		if ($row_updated >= 1)
+		{
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$row_updated Subscribers(s) Updated Successfully!</strong></p></div>";
+		}else{
+			echo "<div id=\"message\" class=\"error\"><p><strong>Could not Update Subscriber due to some error</strong></p></div>";
 		}
 	}
 	?>
@@ -323,72 +511,124 @@ function st_category_email_subscribe_subscribers_page() {
 							<div class="handlediv" title="Click to toggle"><br /></div>
 							<h3 class="hndle"><span><?php _e('Subscribers','stemail')?></span></h3>
 							<div class="inside">
+								<!--input type="submit" name="ExportCSV" value="Export to CSV" id="btnExport" class="button" /-->
 								<?php
-									
-									$table_result = $wpdb->get_results("SELECT * FROM $table_name ");
-									echo "<form id=\"st_subscriber\" action=\"" .$_SERVER["PHP_SELF"] . "?page=st_category_email_subscriber\" method=\"post\">";
-									echo "<div class=\"dataTables_wrapper\" role=\"grid\">";
-									echo "<table class=\"display sortable\" id=\"display_data\" style=\"width:100%;\" >";
-									echo "<thead><th class=\"unsortable\"><span><input type='checkbox' name='checkall' onclick='checkedAll();'/> Select All<span/> </th><th>Id</th><th>Name</th><th>Email</th><th>Category</th></tr></thead>";	
-									echo "<tbody>";
-									echo "<input type=\"submit\" name=\"Unsubscribe\" value=\"Unsubscribe\" id=\"btnUnsubscribe\" class=\"button\" />";
-									echo "<input type=\"submit\" name=\"ExportCSV\" value=\"Export to CSV\" id=\"btnExport\" class=\"button\" />";
-									foreach ( $table_result as $table_row ) 
-									{
-										echo "<tr>";
-										echo "<td><input type=\"checkbox\" name=\"checkbox[]\" value=\"" . $table_row->st_id . "\"></input></td>";
-										echo "<td>" . $table_row->st_id . "</td>";
-										echo "<td>" . $table_row->st_name . "</td>";
-										echo "<td>" . $table_row->st_email . "</td>";
-										echo "<td>" . get_cat_name($table_row->st_category) . "</td>";
-										echo "</tr>";
-									}
-						
-									echo "</tbody>";
-									echo "</table></form>";
-									?>
+									$Subscribers = new Subscribers_Table();
+									$Subscribers->prepare_items();
+									$Subscribers->display();
+								?>
 							</div>
 						</div>
 					</div>
-						<div class="meta-box-sortables">
-							<div id="toc" class="postbox">
-								<div class="handlediv" title="Click to toggle"><br /></div>
-								<h3 class="hndle"><span><?php _e('Import Subscribers','stemail')?></span></h3>
-								<div class="inside">
-									<form id="upload" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="POST">
-										<input type="hidden" name="file_upload" id="file_upload" value="true" />
-										<input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
-										<strong><?php _e('Choose a CSV file to upload: ','stemail')?></strong><input name="csvfile" id="csvfile" type="file" size="25" />
-										<input type="submit" class="button-primary" name="UploadFile" value="Upload File" />
-									</form>
-								</div>
+					<div class="meta-box-sortables" id="edit_subscriber">
+						<div id="toc" class="postbox">
+							<div class="handlediv" title="Click to toggle"><br /></div>
+							<h3 class="hndle"><span><?php _e('Edit Subscriber','stemail')?></span></h3>
+							<div class="inside">
+								<a name="edit_a_subscriber"></a>
+								<form id="edit_a_subscriber" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="post">
+									<input name="edit_st_id" id="edit_st_id" type="hidden" value=""/>
+									<div>
+										<label><?php _e('Name','stemail')?></label>
+										<input name="edit_st_name" id="edit_st_name" class="regular-text" value=""/>
+									</div>
+									<div>
+										<label><?php _e('Email','stemail')?></label>
+										<input name="edit_st_email" id="edit_st_email" class="regular-text" value=""/>
+									</div>
+									<div>
+										<label for="edit_st_category"><?php _e('Category','stemail')?></label>
+										<?php $select_cats = wp_dropdown_categories("name=edit_st_category[]&id=edit_st_category&echo=0&hide_empty=0&hierarchical=1")?>
+										<?php $select_cats = str_replace( 'id=', 'multiple="multiple" id=', $select_cats ); ?>
+										<?php echo $select_cats; ?>
+									</div>
+									<div>
+										<input type="submit" class="button-primary" name="Save"  value="Save" />
+									</div>
+								</form>
 							</div>
 						</div>
-						<div class="meta-box-sortables">
-							<div id="toc" class="postbox">
-								<div class="handlediv" title="Click to toggle"><br /></div>
-								<h3 class="hndle"><span><?php _e('Add a Subscriber','stemail')?></span></h3>
-								<div class="inside">
-									<form id="add_subscriber" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="post">
-										<div>
-											<label><?php _e('Name','stemail')?></label>
-											<input name="sub_name" class="regular-text code" value=""/>
-										</div>
-										<div>
-											<label><?php _e('Email','stemail')?></label>
-											<input name="sub_email" class="regular-text code" value=""/>
-										</div>
-										<div>
-											<label for="st_category"><?php _e('Category','stemail')?></label>
-											<?php echo wp_dropdown_categories("name=st_category&id=st_category&show_option_all=All Categories&echo=0&hide_empty=0&hierarchical=1")?>
+					</div>
+					<div class="meta-box-sortables">
+						<div id="toc" class="postbox">
+							<div class="handlediv" title="Click to toggle"><br /></div>
+							<h3 class="hndle"><span><?php _e('Import Subscribers','stemail')?></span></h3>
+							<div class="inside">
+								<a name="import_csv"></a>
+								<form id="upload" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="POST">
+									<input type="hidden" name="file_upload" id="file_upload" value="true" />
+									<input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
+									<strong><?php _e('Choose a CSV file to upload: ','stemail')?></strong><input name="csvfile" id="csvfile" type="file" size="25" />
+									<input type="submit" class="button-primary" name="UploadFile" value="Upload File" />
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="meta-box-sortables">
+						<div id="toc" class="postbox">
+							<div class="handlediv" title="Click to toggle"><br /></div>
+							<h3 class="hndle"><span><?php _e('Add a Subscriber','stemail')?></span></h3>
+							<div class="inside">
+								<a name="add_subscriber"></a>
+								<form id="add_subscriber" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="post">
+									<div>
+										<label><?php _e('Name','stemail')?></label>
+										<input name="sub_name" class="regular-text code" value=""/>
+									</div>
+									<div>
+										<label><?php _e('Email','stemail')?></label>
+										<input name="sub_email" class="regular-text code" value=""/>
+									</div>
+									<div>
+										<label for="st_category"><?php _e('Category','stemail')?></label>
+										<?php $select_cats =  wp_dropdown_categories("name=st_category&id=st_category&show_option_all=All Categories&echo=0&hide_empty=0&hierarchical=1")?>
+										<?php $select_cats = str_replace( 'id=', 'multiple="multiple" id=', $select_cats ); ?>
+										<?php echo $select_cats; ?>
+									</div>
+									<div>
 										<input type="submit" class="button-primary" name="Subscribe"  value="Subscribe" />
-									</form>
-								</div>
+									</div>
+								</form>
 							</div>
 						</div>
 					</div>
 				</div>
             </div>				
+			<div class="postbox-container side" style="width:20%;">
+				<div class="metabox-holder">
+					<div class="meta-box-sortables">
+						<div id="toc" class="postbox">
+							<div class="handlediv" title="Click to toggle"><br /></div>
+							<h3 class="hndle"><span><?php _e('Manage Subscribers', 'stemail')?></span></h3>
+							<div class="inside">
+								<a href="#import_csv"><?php _e('Import Subscribers from CSV', 'stemail')?></a><br/>
+								<a href="#add_subscriber"><?php _e('Add a Subscriber', 'stemail')?></a>
+							</div>
+						</div>
+						<div id="toc" class="postbox">
+							<div class="handlediv" title="Click to toggle"><br /></div>
+							<h3 class="hndle"><span><?php _e('Show your Support', 'stemail')?></span></h3>
+							<div class="inside">
+								<p>
+								<strong><?php _e('Want to help make this plugin even better? All donations are used to improve this plugin, so donate $20, $50 or $100 now!', 'stemail')?></strong>
+								</p>
+								<a href="http://sanskrutitech.in/wordpress-plugins/st-category-email-subscribe/"><?php _e('Donate', 'stemail')?></a>
+							</div>
+						</div>
+						<div id="toc" class="postbox">
+						<div class="handlediv" title="Click to toggle"><br /></div>
+							<h3 class="hndle"><span><?php _e('Connect With Us ', 'stemail')?></span></h3>
+							<div class="inside">
+								<a class="facebook" href="https://www.facebook.com/sanskrutitech"></a>
+								<a class="twitter" href="https://twitter.com/#!/sanskrutitech"></a>
+								<a class="googleplus" href="https://plus.google.com/107541175744077337034/posts"></a>
+								<a class="website" href="http://sanskrutitech.in/"></a>
+								<a class="email" href="mailto:info@sanskrutitech.in"></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	<?php
 }

@@ -128,6 +128,20 @@ a.googleplus {
 	height:32px;	
 	margin-right:5px;
 }
+a.website {
+	display:inline-block;
+	background-image:url('website.png');
+	width:33px;
+	height:32px;	
+	margin-right:5px;
+}
+a.email {
+	display:inline-block;
+	background-image:url('email.png');
+	width:33px;
+	height:32px;	
+	margin-right:5px;
+}
 /**Form**/
 form div{
 	margin:5px;
