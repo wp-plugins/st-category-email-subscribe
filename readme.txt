@@ -4,7 +4,7 @@ Donate link: http://sanskrutitech.in/index.php/wordpress-plugins/
 Tags: subscribe, email, category
 Requires at least: 3.3.1
 Tested up to: 4.0.1
-Stable tag: 0.6
+Stable tag: 0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,8 @@ c. Upload using CSV File
 5. 	You can Unsubscribe the Subscriber by select the emails and using the **Unsubscribe** button 
 
 == Changelog ==
+= 0.7 =
+* Minor Bug Fixing
 = 0.6 =
 * Allow multiple categories selection
 = 0.5 =
@@ -66,6 +68,8 @@ c. Upload using CSV File
 * Translate ready
 
 == Upgrade Notice ==
+= 0.7 =
+* Minor Bug Fixing
 = 0.6 =
 * Now visitors can opt into multiple categories.
 = 0.5 =

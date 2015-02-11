@@ -116,11 +116,11 @@ class Subscribers_Table extends WP_List_Table
     public function get_columns()
     {
         $columns = array(
+			'cb'        	=> '<input type="checkbox" />',
             'id'          	=> 'ID',
 			'st_name'  		=> 'Name',
             'st_email'  	=> 'Email',
 			'st_category'  	=> 'Categories',
-            'actions'      	=> 'Action'
         );
 		
 		return $columns;
@@ -145,6 +145,25 @@ class Subscribers_Table extends WP_List_Table
 					 'st_email' 	=> array('st_email', true),
 					);
     }
+	function get_bulk_actions() {
+		$actions = array(
+			'delete'    => 'Delete'
+		);
+		return $actions;
+	}
+	function column_cb($item) {
+        return sprintf(
+            '<input type="checkbox" name="subscriber[]" value="%s" />', $item['st_id']
+        );    
+    }
+	function column_st_name($item) {
+	  $actions = array(
+				'edit'      => sprintf('<a href="?page=%s&action=%s&subscriber_id=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
+				'delete'    => sprintf('<a href="?page=%s&action=%s&subscriber_id=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
+			);
+
+	  return sprintf('%1$s %2$s', $item['st_name'], $this->row_actions($actions) );
+	}
 	/**
      * Get the table data
      *
@@ -171,17 +190,17 @@ class Subscribers_Table extends WP_List_Table
 			}else{
 				
 				$st_categories = explode(",",$subscriber->st_category);
+				$st_list_category_array = array();
 				foreach($st_categories as $st_category){
-					$st_list_category .= get_cat_name($st_category)." ";
+					$st_list_category_array[] = get_cat_name($st_category);
 				}
-				
+				$st_list_category = implode(",",$st_list_category_array);
 			}
 			$data[] = array(
                     'id'          => $subscriber->st_id,
 					'st_name'	  => $subscriber->st_name,
                     'st_email'    => $subscriber->st_email,
-					'st_category' => $st_list_category,
-                    'actions' 	  => "<a href='#' st_id='".$subscriber->st_id."' st_name='".$subscriber->st_name."' st_email='".$subscriber->st_email."' st_category='".$subscriber->st_category."' class='edit_this_subscriber'>Edit</a> | <a href='".$this_page."&action=delete&delete_id=".$subscriber->st_id."'>Delete</a>"
+					'st_category' => $st_list_category
                );
 			}
         return $data;
@@ -421,6 +440,19 @@ function st_category_email_subscribe_subscribers_page() {
 	$st_email_table = $wpdb->prefix . $st_email_table_suffix;
 	$column_string = "st_name,st_email,st_category";
 	
+	if(isset($_REQUEST['action'])){
+		if ($_REQUEST['action']=='edit'){
+			$edit_st_id=$_REQUEST['subscriber_id'];
+			$sql = "SELECT * FROM $st_email_table WHERE st_id=$edit_st_id;";
+			$subscriber = $wpdb->get_row($sql);
+			$edit_st_name = $subscriber->st_name;
+			$edit_st_email = $subscriber->st_email;
+			$edit_st_category = $subscriber->st_category;
+			//Fetch Details
+			$edit_subscriber = TRUE;
+		}
+	}
+	
 
 	if(isset($_REQUEST['UploadFile']))
 	{
@@ -491,11 +523,13 @@ function st_category_email_subscribe_subscribers_page() {
 		if(isset($_REQUEST['edit_st_category'])){
 			$edit_st_category =  $_REQUEST['edit_st_category'];
 			$edit_st_category = implode(",",$edit_st_category);
+			echo $edit_st_category;
 		}
 
 		$row_updated = $wpdb->update($st_email_table,array('st_name'=>$edit_st_name,'st_email'=>$edit_st_email,'st_category'=>$edit_st_category),array( 'st_id' => $edit_st_id ));
-		if ($row_updated >= 1)
-		{
+		//$wpdb->show_errors();
+		//$wpdb->print_error();
+		if ($row_updated >= 1){
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>$row_updated Subscribers(s) Updated Successfully!</strong></p></div>";
 		}else{
 			echo "<div id=\"message\" class=\"error\"><p><strong>Could not Update Subscriber due to some error</strong></p></div>";
@@ -520,6 +554,7 @@ function st_category_email_subscribe_subscribers_page() {
 							</div>
 						</div>
 					</div>
+					<?php if ($edit_subscriber){ ?>
 					<div class="meta-box-sortables" id="edit_subscriber">
 						<div id="toc" class="postbox">
 							<div class="handlediv" title="Click to toggle"><br /></div>
@@ -527,16 +562,17 @@ function st_category_email_subscribe_subscribers_page() {
 							<div class="inside">
 								<a name="edit_a_subscriber"></a>
 								<form id="edit_a_subscriber" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']."?page=st_category_email_subscriber"; ?>" method="post">
-									<input name="edit_st_id" id="edit_st_id" type="hidden" value=""/>
+									<input name="edit_st_id" id="edit_st_id" type="hidden" value="<?=$edit_st_id;?>"/>
 									<div>
 										<label><?php _e('Name','stemail')?></label>
-										<input name="edit_st_name" id="edit_st_name" class="regular-text" value=""/>
+										<input name="edit_st_name" id="edit_st_name" class="regular-text" value="<?=$edit_st_name;?>"/>
 									</div>
 									<div>
 										<label><?php _e('Email','stemail')?></label>
-										<input name="edit_st_email" id="edit_st_email" class="regular-text" value=""/>
+										<input name="edit_st_email" id="edit_st_email" class="regular-text" value="<?=$edit_st_email;?>"/>
 									</div>
 									<div>
+										<input id="edit_st_category_value" type="hidden" value="<?=$edit_st_category;?>" />
 										<label for="edit_st_category"><?php _e('Category','stemail')?></label>
 										<?php $select_cats = wp_dropdown_categories("name=edit_st_category[]&id=edit_st_category&echo=0&hide_empty=0&hierarchical=1")?>
 										<?php $select_cats = str_replace( 'id=', 'multiple="multiple" id=', $select_cats ); ?>
@@ -549,6 +585,7 @@ function st_category_email_subscribe_subscribers_page() {
 							</div>
 						</div>
 					</div>
+					<?php } ?>
 					<div class="meta-box-sortables">
 						<div id="toc" class="postbox">
 							<div class="handlediv" title="Click to toggle"><br /></div>
