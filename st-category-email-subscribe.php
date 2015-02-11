@@ -3,7 +3,7 @@
 	Plugin Name: St Category Email Subscribe
 	Plugin URI: http://www.sanskrutitech.in
 	Description: Plugin that allows Users to Subscribe for Emails based on Category.They will receive an email when a post is published in the category they have subscribed to.
-	Version: 0.6
+	Version: 0.7
 	Author: Sanskruti Technologies
 	Author URI: http://www.sanskrutitech.in
 	Author Email: dhara@sanskrutitech.in
