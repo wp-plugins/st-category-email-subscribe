@@ -3,7 +3,7 @@
 	Plugin Name: St Category Email Subscribe
 	Plugin URI: http://www.sanskrutitech.in
 	Description: Plugin that allows Users to Subscribe for Emails based on Category.They will receive an email when a post is published in the category they have subscribed to.
-	Version: 0.7
+	Version: 0.8
 	Author: Sanskruti Technologies
 	Author URI: http://www.sanskrutitech.in
 	Author Email: dhara@sanskrutitech.in
@@ -81,28 +81,23 @@ function st_category_email_install() {
 
 	$st_category_email_db_ver = (float) $st_category_email_db_ver;
 	
-	/** If Updating from an older version */
-	if($db_ver < $st_category_email_db_ver)
-	{
-		if($db_ver >= 0.5){
-			$sql = "ALTER TABLE $st_email_table CHANGE st_category st_category VARCHAR(100);";
-			$wpdb->query($sql);
-		}
+	//Create table for subscribers
+	$sql = "CREATE TABLE IF NOT EXISTS $st_email_table  (
+		st_id INT(9) NOT NULL AUTO_INCREMENT,
+		st_name VARCHAR(200),
+		st_email VARCHAR(200) NOT NULL,
+		st_category bigint(20),
+		UNIQUE KEY st_id (st_id)
+	);";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	dbDelta($sql);
+
+	if($db_ver == "0.5"){
+		$sql = "ALTER TABLE $st_email_table CHANGE st_category st_category VARCHAR(100);";
+		$wpdb->query($sql);
 	}
-	/* If new installation*/ 
-	else{
-		//Create table for subscribers
-		$sql = "CREATE TABLE $st_email_table  (
-			st_id INT(9) NOT NULL AUTO_INCREMENT,
-			st_name VARCHAR(200),
-			st_email VARCHAR(200) NOT NULL,
-			st_category VARCHAR(100),
-			UNIQUE KEY st_id (st_id)
-		);";
-	
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-	}
+
 	
 	//Set DB Version
 	update_option("st_category_email_db_ver", $st_category_email_db_ver);
@@ -136,6 +131,7 @@ function st_category_email_subscribe_admin_scripts() {
 	wp_enqueue_script('jquery');
 	
 	wp_enqueue_script( 'st-category-email-jquery.multiple.select.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/jquery.multiple.select.js', array(), '1.0.0', true );
+	wp_enqueue_script( 'st-category-email-jquery.csv.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/jquery.csv-0.71.min.js', array(), '1.0.0', true );
 	wp_enqueue_script( 'st-category-email-admin_scripts.js', WP_ST_CATEGORY_EMAIL_URL . '/scripts/admin_scripts.js', array(), '1.0.0', true );
 }
 
@@ -211,10 +207,9 @@ if ($_POST['st_subscribe_form']) {
 	$email = $_POST['st_email'];
 	$category = $_POST['st_category'];
 	$category = implode(",",$_POST['st_category']);
-	
+	echo $category;
 	if (is_email($email)) {
-		$exists = $wpdb->get_results("SELECT * FROM ".$subscribers_table." where st_email like '".esc_sql($email)."' limit 1");
-		//print_r($exists);
+		$exists = mysql_query("SELECT * FROM ".$subscribers_table." where st_email like '".esc_sql($email)."' limit 1");
 		if (mysql_num_rows($exists) <1) {
 			$wpdb->insert($subscribers_table,array('st_name'=>esc_sql($name), 'st_email'=>esc_sql($email),'st_category'=>$category));
 		}
